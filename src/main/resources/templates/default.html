@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="ISO-8859-1">
+		<title>RPN Calculator</title>
+		<link rel="stylesheet" href="styles.css">
+	</head>
+	<body>
+		<h1>RPN Calculator</h1>
+		<div class="form">
+			<form method="post" action="/enter">
+				<div>
+					<input type="number" step="any" name="value" required autofocus><br>
+				</div>
+				<div>
+					<button class="button">Enter</button>
+				</div>
+			</form>
+			<div>
+				<form method="post" action="/abs">
+					<button>abs</button>
+				</form>
+			</div>
+			{{#hasTwoOrMoreNumbers}}
+			<div>
+				<form method="post" action="/add">
+					<button>+</button>
+				</form>
+			</div>
+			<div>
+				<form method="post" action="/minus">
+					<button>-</button>
+				</form>
+			</div>
+			{{/hasTwoOrMoreNumbers}}
+			{{#hasUndoer}}
+			<div>
+				<form method="post" action="/undo">
+					<button>Undo</button>
+				</form>
+			</div>	
+			{{/hasUndoer}}		
+		</div>
+		<div class="stack">
+			<h1 class="stack-title">Stack</h1>
+			<ol class="stack-list">
+			{{#stack}}
+				<li>{{ . }}</li>
+			{{/stack}}
+			</ol>
+		</div>
+	</body>
+</html>

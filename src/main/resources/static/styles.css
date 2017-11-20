@@ -1,0 +1,29 @@
+@charset "ISO-8859-1";
+body{
+	background-color: black;
+	color: green;
+}
+.form{
+
+	text-align: right;
+	display: inline-block;
+	vertical-align: top;
+	
+	width: 40%;
+}
+.button{
+	text-align: right;
+}
+.stack{
+	display: inline-block;
+	width: 55%;
+	padding-left: 16px;
+}
+.stack-title{
+	margin-top: 0;
+}
+.stack-list {
+	list-style: none;
+	padding: 0;
+}
+
