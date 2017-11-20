@@ -8,14 +8,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.lmig.gfc.rpn.models.OneArgumentUndoer;
-import com.lmig.gfc.rpn.models.Redoer;
 import com.lmig.gfc.rpn.models.TwoArgumentUndoer;
 
 @Controller
 public class CalculatorController {
 	private Stack<Double> stack;
 	private OneArgumentUndoer undoer;
-	private Redoer redoer;
 	
 	public CalculatorController() {
 		stack = new Stack<Double>();
@@ -47,7 +45,6 @@ public class CalculatorController {
 		double result = first + second;
 		stack.push(result);
 		undoer = new TwoArgumentUndoer(first, second);
-		redoer = new Redoer(result);
 		ModelAndView mv = new ModelAndView();
 		mv.setViewName("redirect:/");
 		return mv;  
@@ -60,7 +57,6 @@ public class CalculatorController {
 		double result = second-first;
 		stack.push(result);
 		undoer = new TwoArgumentUndoer(first, second);
-		redoer = new Redoer(result);
 		ModelAndView mv = new ModelAndView();
 		mv.setViewName("redirect:/");
 		return mv; 
