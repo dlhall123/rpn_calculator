@@ -10,11 +10,12 @@ import org.springframework.web.servlet.ModelAndView;
 import com.lmig.gfc.rpn.models.AbsCalculator;
 import com.lmig.gfc.rpn.models.Adder;
 import com.lmig.gfc.rpn.models.Divider;
+import com.lmig.gfc.rpn.models.Exponent;
 import com.lmig.gfc.rpn.models.Multiplier;
 import com.lmig.gfc.rpn.models.OneArgumentUndoer;
 import com.lmig.gfc.rpn.models.PushUndoer;
 import com.lmig.gfc.rpn.models.Subtracter;
-import com.lmig.gfc.rpn.models.TwoArgumentUndoer;
+import com.lmig.gfc.rpn.models.TwoNumberCalculation;
 import com.lmig.gfc.rpn.models.Undoer;
 
 @Controller
@@ -33,6 +34,7 @@ public class CalculatorController {
 		ModelAndView mv = new ModelAndView();
 		mv.setViewName("default");
 		mv.addObject("stack",stack);
+		mv.addObject("hasOneOrMoreNumber", stack.size()>= 1);
 		mv.addObject("hasTwoOrMoreNumbers", stack.size()>= 2);
 		mv.addObject("hasUndoer", undoers.size()>0);
 		return mv;
@@ -50,40 +52,28 @@ public class CalculatorController {
 	@PostMapping("/add")
 	public ModelAndView addTwoNumbers() {
 		Adder adder = new Adder(stack);
-		adder.goDoIt();
-		undoers.push(adder);
-		
-		ModelAndView mv = new ModelAndView();
-		mv.setViewName("redirect:/");
-		return mv;  
+		return doOperation(adder);
 	}
 	
 	@PostMapping("/minus")
 	public ModelAndView subtractTwoNumbers() {
 		Subtracter subtracter = new Subtracter(stack);
-		subtracter.goDoIt();
-		undoers.push(subtracter);
-		ModelAndView mv = new ModelAndView();
-		mv.setViewName("redirect:/");
-		return mv; 
+		return doOperation(subtracter);
 	} 
 	@PostMapping("/divide")
 	public ModelAndView divideTwoNumbers() {
 		Divider divider = new Divider(stack);
-		divider.goDoIt();
-		undoers.push(divider);
-		ModelAndView mv = new ModelAndView();
-		mv.setViewName("redirect:/");
-		return mv; 
+		return doOperation(divider);
 	} 
 	@PostMapping("/multiply")
 	public ModelAndView multiplyTwoNumbers() {
 		Multiplier multiplier = new Multiplier(stack);
-		multiplier.goDoIt();
-		undoers.push(multiplier);
-		ModelAndView mv = new ModelAndView();
-		mv.setViewName("redirect:/");
-		return mv; 
+		return doOperation(multiplier);
+	} 
+	@PostMapping("/exponent")
+	public ModelAndView exponentTwoNumbers() {
+		Exponent exponent = new Exponent(stack);
+		return doOperation(exponent);
 	} 
 	
 	@PostMapping("/undo")
@@ -103,6 +93,14 @@ public class CalculatorController {
 		calc = new AbsCalculator();
 		double number = calc.calculateAbs(stack);
 		undoers.push(new OneArgumentUndoer(number));
+		ModelAndView mv = new ModelAndView();
+		mv.setViewName("redirect:/");
+		return mv; 
+	}
+	
+	private ModelAndView doOperation(TwoNumberCalculation calc) {
+		calc.goDoIt();
+		undoers.push(calc);
 		ModelAndView mv = new ModelAndView();
 		mv.setViewName("redirect:/");
 		return mv; 
