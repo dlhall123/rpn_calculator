@@ -1,3 +1,8 @@
+//button to clear the stack, and re-add the entire stack
+
+//swap button - swap the position of the 2 most recent values in the stack (make undoable by hitting swap again)
+//Rotate button - takes the second from last number and moves to top of stack and push to the beginning
+
 package com.lmig.gfc.rpn.controllers;
 
 import java.util.Stack;
@@ -7,26 +12,28 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.lmig.gfc.rpn.models.AbsCalculator;
+import com.lmig.gfc.rpn.models.AbsoluterOfOneNumber;
 import com.lmig.gfc.rpn.models.Adder;
+import com.lmig.gfc.rpn.models.Clearer;
 import com.lmig.gfc.rpn.models.Divider;
 import com.lmig.gfc.rpn.models.Exponent;
+import com.lmig.gfc.rpn.models.GoDoer;
 import com.lmig.gfc.rpn.models.Multiplier;
-import com.lmig.gfc.rpn.models.OneArgumentUndoer;
-import com.lmig.gfc.rpn.models.PushUndoer;
+import com.lmig.gfc.rpn.models.Pusher;
+import com.lmig.gfc.rpn.models.Rotator;
 import com.lmig.gfc.rpn.models.Subtracter;
-import com.lmig.gfc.rpn.models.TwoNumberCalculation;
-import com.lmig.gfc.rpn.models.Undoer;
+import com.lmig.gfc.rpn.models.Swapper;
 
 @Controller
-public class CalculatorController {
+public class CalculatorController { 
 	private Stack<Double> stack;
-	private Stack<Undoer> undoers;
-	private AbsCalculator calc;
+	private Stack<GoDoer> undoers;
+	private Stack<GoDoer> redoers; 
 	
 	public CalculatorController() {
 		stack = new Stack<Double>();
-		undoers = new Stack<Undoer>();
+		undoers = new Stack<GoDoer>();
+		redoers = new Stack<GoDoer>();
 	}
 	
 	@GetMapping("/")
@@ -36,17 +43,34 @@ public class CalculatorController {
 		mv.addObject("stack",stack);
 		mv.addObject("hasOneOrMoreNumber", stack.size()>= 1);
 		mv.addObject("hasTwoOrMoreNumbers", stack.size()>= 2);
+		mv.addObject("hasThreeOrMoreNumbers", stack.size()>=3);
 		mv.addObject("hasUndoer", undoers.size()>0);
+		mv.addObject("hasRedoer", redoers.size()>0);
 		return mv;
 	}
 	
 	@PostMapping("/enter")
 	public ModelAndView pushNumberOntoStack(double value) {
-		stack.push(value);
-		undoers.push(new PushUndoer());
-		ModelAndView mv = new ModelAndView();
-		mv.setViewName("redirect:/");
-		return mv; 
+		Pusher pusher = new Pusher(stack, value);
+		return doOperation(pusher);
+	}
+	//Adding stack clearing
+	@PostMapping("/clear")
+	public ModelAndView clearStack() {
+		Clearer clearer = new Clearer(stack);
+		return doOperation(clearer);
+	}
+	//Adding Swapping
+	@PostMapping("/swap")
+	public ModelAndView swapStack() {
+		Swapper swapper = new Swapper(stack);
+		return doOperation(swapper);
+	}
+	//Adding rotating
+	@PostMapping("/rotate")
+	public ModelAndView rotateStack() {
+		Rotator rotator = new Rotator(stack);
+		return doOperation(rotator);
 	}
 	
 	@PostMapping("/add")
@@ -78,32 +102,40 @@ public class CalculatorController {
 	
 	@PostMapping("/undo")
 	public ModelAndView undo() {
-		Undoer undoer = undoers.pop();
+		GoDoer undoer = undoers.pop();
 		undoer.undo(stack);
-		ModelAndView mv = new ModelAndView();
-		mv.setViewName("redirect:/");
-		return mv; 
+		redoers.push(undoer);
+		return redirectToHome();
+	}
+	
+	@PostMapping("/redo")
+	public ModelAndView redo() {
+		GoDoer godo = redoers.pop();
+		godo.goDoIt();
+		undoers.push(godo);
+		return redirectToHome();
 	}
 	
 	@PostMapping("/abs")
 	public ModelAndView abs() {
-//		double number = stack.pop();
-//		double abs = Math.abs(number);
-//		stack.push(abs);
-		calc = new AbsCalculator();
-		double number = calc.calculateAbs(stack);
-		undoers.push(new OneArgumentUndoer(number));
-		ModelAndView mv = new ModelAndView();
-		mv.setViewName("redirect:/");
-		return mv; 
+		AbsoluterOfOneNumber calc = new AbsoluterOfOneNumber(stack);
+		return doOperation(calc); 
 	}
 	
-	private ModelAndView doOperation(TwoNumberCalculation calc) {
+	private ModelAndView doOperation(GoDoer calc) {
 		calc.goDoIt();
 		undoers.push(calc);
+		redoers.clear();
+		return redirectToHome();
+	} 
+	
+	private ModelAndView redirectToHome() {
 		ModelAndView mv = new ModelAndView();
 		mv.setViewName("redirect:/");
-		return mv; 
+		return mv;   
+		
 	}
+	
+	
 	
 }

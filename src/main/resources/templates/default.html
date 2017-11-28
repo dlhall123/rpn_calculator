@@ -22,6 +22,11 @@
 					<button>abs</button>
 				</form>
 			</div>
+			<div>
+				<form method="post" action="/clear">
+					<button>Clear Stack</button>
+				</form>
+			</div>
 			{{/hasOneOrMoreNumber}}
 			{{#hasTwoOrMoreNumbers}}
 			<div>
@@ -49,14 +54,33 @@
 					<button>^</button>
 				</form>
 			</div>
+			<div>
+				<form method="post" action="/swap">
+					<button>Swap</button>
+				</form>
+			</div>
 			{{/hasTwoOrMoreNumbers}}
+			{{#hasThreeOrMoreNumbers}}
+			<div>
+				<form method="post" action="/rotate">
+					<button>Rotate</button>
+				</form>
+			</div>
+			{{/hasThreeOrMoreNumbers}}
 			{{#hasUndoer}}
 			<div>
 				<form method="post" action="/undo">
 					<button>Undo</button>
 				</form>
 			</div>	
-			{{/hasUndoer}}		
+			{{/hasUndoer}}	
+			{{#hasRedoer}}
+						<div>
+				<form method="post" action="/redo">
+					<button>Redo</button>
+				</form>
+			</div>	
+			{{/hasRedoer}}	
 		</div>
 		<div class="stack">
 			<h1 class="stack-title">Stack</h1>
