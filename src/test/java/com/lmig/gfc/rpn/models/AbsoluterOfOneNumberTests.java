@@ -1,59 +1,93 @@
 package com.lmig.gfc.rpn.models;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
+import java.util.EmptyStackException;
 import java.util.Stack;
 
 import org.junit.Before;
 import org.junit.Test;
 
 public class AbsoluterOfOneNumberTests {
-	
+
 	private Stack<Double> stack;
 	private AbsoluterOfOneNumber abs;
-	
+
 	@Before
 	public void setUp() {
 		stack = new Stack<Double>();
 		abs = new AbsoluterOfOneNumber(stack);
 	}
-	
+
 	@Test
-	public void  goDoIt_replaces_neg_number_on_stack_with_positive_number() {
-		//Arrange
+	public void goDoIt_replaces_neg_number_on_stack_with_positive_number() {
+		// Arrange
 		stack.push(-4.5);
-		
-		//Act
+
+		// Act
 		abs.goDoIt();
-		
-		//Assert
+
+		// Assert
 		assertThat(stack.peek()).isEqualTo(4.5);
 	}
-	
+
 	@Test
-	public void  goDoIt_leaves_pos_num_on_stack_pos() {
-		//Arrange
+	public void goDoIt_leaves_pos_num_on_stack_pos() {
+		// Arrange
 		stack.push(4.5);
-		
-		//Act
+
+		// Act
 		abs.goDoIt();
-		
-		//Assert
+
+		// Assert
 		assertThat(stack.peek()).isEqualTo(4.5);
 	}
-	
+
 	@Test
 	public void undo_returns_the_stack_to_the_previous_state() {
-		//Arrange
+		// Arrange
 		stack.push(-999.0);
 		abs.goDoIt();
-		
-		//Act
+
+		// Act
 		abs.undo(stack);
-		
-		//Assert
+
+		// Assert
 		assertThat(stack.peek()).isEqualTo(-999.0);
-		
+
+	}
+
+	@Test
+	public void empty_stack_causes_goDoIt_to_throw_EmptyStackException() {
+		// Arrange
+		// Already arranged because stack is empty
+
+		try {
+			// Act
+			abs.goDoIt();
+
+			// Assert
+			fail("Did not throw an EmptyStackException");
+		} catch (EmptyStackException ese) {
+		}
+
+	}
+
+	@Test
+	public void null_stack_causes_goDoIt_to_throw_NullPointerException() {
+		// Arrange
+		abs = new AbsoluterOfOneNumber(null);
+
+		try {
+			// Act
+			abs.goDoIt();
+
+			// Assert
+			fail("Did not throw NullPointerException");
+		} catch (NullPointerException npe) {
+		}
+
 	}
 
 }
